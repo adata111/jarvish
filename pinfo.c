@@ -27,6 +27,7 @@ void readStat(pid_t pid){
 	FILE *stream = fopen(statFile, "r");
 	if(stream == NULL){
 		fprintf(stderr,"jarvish: pinfo: No process with ID %d exists\n",pid);
+		exitCode = -1;
 		free(statFile);
 		return;
 	}
@@ -70,6 +71,7 @@ void pinfo(char *tokens[200], int tokenCnt){
 	}
 	else{
 		write(2,"jarvish: pinfo: Too many arguments\n",50);
+		exitCode = -1;
 		return;
 	}
 

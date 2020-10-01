@@ -41,14 +41,18 @@ void childHandler(int sig){
     		//	prompt();
         	}
      
-        	else fprintf(stderr,"\033[0;91m\n%s with pid %d exited with exit status %d\n\033[0m",proc, pid, childStatus);
+        	else {
+        		fprintf(stderr,"\033[0;91m\n%s with pid %d exited with exit status %d\n\033[0m",proc, pid, childStatus);
+        		exitCode = -2;
+        	}
         	fflush(stdout);
         	if(1) prompt();
         }
         else{
         	fprintf(stderr,"\033[0;91m\n%s with pid %d failed to exit normally. Status: %d\n\033[0m",proc, pid, childStatus);
         	fflush(stdout);
-    	prompt();
+        	exitCode = -2;
+    		prompt();
         }
         free(proc);
 
@@ -70,7 +74,11 @@ void executeSys(char *tokens[200], int tokenCnt, int backgnd){
 		tokens[tokenCnt-1]=NULL;
 	
 	int forkRet = fork();
-	if(forkRet == 0){
+	if(forkRet<0){
+		perror("Jarvish: fork");
+		exitCode = -2;
+	}
+	else if(forkRet == 0){
 		//kiddo
 		signal (SIGQUIT, SIG_DFL);
            signal (SIGTSTP, SIG_DFL);
@@ -91,6 +99,7 @@ void executeSys(char *tokens[200], int tokenCnt, int backgnd){
 		if(execvp(tokens[0],tokens)==-1){
 			fprintf(stderr,"Jarvish: %s: Oops! Command not found :(\n",tokens[0]);
 			freeToks();
+			exitCode = -2;
 			exit(1);
 		//	return;
 		}
@@ -112,16 +121,33 @@ void executeSys(char *tokens[200], int tokenCnt, int backgnd){
 			fgPid=forkRet;
 			strcpy(fgName,tokens[0]);
 			int wpid = waitpid(forkRet, &status, WUNTRACED);
+
 			/* Children completed: put the shell back in the foreground.  */
 			if( tcsetpgrp (STDIN_FILENO, getpgrp()) < 0) {
 			//	perror("tcsetpgrp 2");
 			//	exit(1);
 			}
+			if(WIFEXITED(status)){
+	        	if(WEXITSTATUS(status) == 0){
+	        	//	printf("normal exit\n");
+	        		exitCode = 5;
+	        	}
+	     
+	        	else {
+	        	//	printf("not normal exit stat\n");
+	        		exitCode = -2;
+	        	}
+	        }
+	        else{
+	        	//printf("not normal exit\n");
+	        	exitCode = -2;
+	        }
 			if( WIFSTOPPED(status) ){
 				strcpy(bgP[bgCnt].name, tokens[0]);
 				bgP[bgCnt].pid = forkRet;
 				bgCnt++;
 				printf("\033[0;91m\nChild process %s with process id %d stopped and sent to background\n\033[0m",fgName,fgPid);
+				exitCode = -2;
 			}
 
 		}
@@ -142,5 +168,7 @@ void executeSys(char *tokens[200], int tokenCnt, int backgnd){
    }*/
 		}   
 	}
-
+	if(exitCode > 0 ){
+		exitCode = 5;
+	}
 }

@@ -74,3 +74,5 @@ These commands have been defined by me and are contained within the shell itself
     - To exit press `q` and hit `enter`.
     - Error handling done for incorrect arguments.
  
+P.S. Pls make sure length of input is less than 2000 characters in total.
+No more than 20 chained commands.

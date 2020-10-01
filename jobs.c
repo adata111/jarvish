@@ -7,6 +7,7 @@ void getStat(pid_t pid){
 	FILE *stream = fopen(statFile, "r");
 	if(stream == NULL){
 		fprintf(stderr,"No process with ID %d exists",pid);
+		exitCode = -1;
 		return;
 	}
 	else{

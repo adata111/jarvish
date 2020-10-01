@@ -17,11 +17,17 @@ void prompt() {
 	char *promptLine,*dir;
 
 	dir=(char *)malloc(2000);
-	if(getcwd(dir,2000)==NULL){
+	if(getcwd(cwd,2000)==NULL){
 		perror("Get current working directory ERROR");
 		exit(1);
 	}
-	strcpy(cwd,dir);
+	strcpy(dir,cwd);
+	if(exitCode < 0){
+		printf(":'(");
+	}
+	else if(exitCode>0)
+		printf(":')");
+
 	if(strcmp(myhome,dir)==0){
 		printf("\033[1;96m<%s@%s:~>\033[0m",user,host);
 	}

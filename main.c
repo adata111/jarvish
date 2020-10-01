@@ -20,6 +20,32 @@ void ctrlZ(int sig){
 	fgPid=-1;
 }
 
+char miniCom[20][2000];
+int num;int op[25];
+char **chain(char *lilCom){
+	char *copy = (char *)calloc(2000,sizeof(char));
+	strcpy(copy,lilCom);
+	char *mini = strtok(copy,"@$");
+	num=0;
+	while(mini!=NULL){
+		strcpy(miniCom[num],mini);
+		++num;
+		mini = strtok(NULL, "@$"); 
+	}
+	char *and = strchr(lilCom,'@');
+	char *or = strchr(lilCom,'$');int n=0;
+	for(int x=0;x<strlen(lilCom);x++){
+		if(lilCom[x]=='@'){
+			op[n]=2;
+			n++;
+		}
+		else if(lilCom[x]=='$'){
+			op[n++]=1;
+		}
+	}
+	free(copy);
+}
+
 int main()
 {
 	welc();
@@ -29,12 +55,15 @@ int main()
 		perror("Get home directory ERROR");
 		exit(1);
 	}
+	strcpy(prevwd,myhome);
+	strcpy(cwd,myhome);
 	for(int i=0;i<30;i++){
 		histArr[i] = (char *)calloc(2000, sizeof(char));
 	}
+	freed=0;
 	bgCnt=0;
 	loadHist();
-	char lilCom[256][2000];
+	char lilCom[100][2000];
 	/*for(int i=0;i<256;i++){
 		lilCom[i] = (char *)malloc(2000 * sizeof(char));
 	}*/
@@ -43,10 +72,13 @@ int main()
 	run=1;
 	signal(SIGINT, ctrlC);
 	signal(SIGTSTP, ctrlZ);
+	exitCode=0;
     while (1)
     {
     	fgPid=-1;
+
         prompt();
+        exitCode = 5;
         // TAKE INPUT HERE
         size_t inpSize = 0;
         char *input; char inp[2000];
@@ -88,19 +120,42 @@ int main()
 		} 
     	free(input);
 		//printf("%c\n",lilCom[numCom][1]);
-		int x=5;
+		int x=5;int j=0;int cumExit;
 		for(int i=0;i<numCom;i++){
 	//		printf("%s\n",lilCom[i]);
-			if(strchr(lilCom[i],'|')){
-				x= pip(lilCom[i]);
-				continue;
+			exitCode=5;
+			chain(lilCom[i]);//split based on and or, and store and or in order, then execute following commands
+			for(j=0;j<num;j++){
+				if(j){
+					if(op[j-1]==1){//OR
+						if(cumExit>0){
+							continue;
+						}
+					}
+					else if(op[j-1]==2){//AND
+						if(cumExit<0){
+							continue;
+						}
+					}
+				}
+				exitCode = 5;
+				if(strchr(miniCom[j],'|')){
+					x= pip(miniCom[j]);
+					continue;
+				}
+				x=chkRedir(miniCom[j]);
+				if(j==0) cumExit = exitCode;
+				else{
+					cumExit=exitCode;
+				}
+
+				//else break;
+	//			printf("%d\n", x);
+				if(x==0) return 0;
 			}
-			chkRedir(lilCom[i]);
-			//else break;
-//			printf("%d\n", x);
-			if(x==0) return 0;
 			
 		}
+		exitCode=cumExit;
 		if(x==0) break;
     //	printf("run=%d\n",x);
 

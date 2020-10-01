@@ -8,6 +8,7 @@ void saveHist(){
 		int i;
 	if(stream == NULL){
 		perror("Jarvish: history");
+		exitCode = -1;
 		return;
 	}
 	else{
@@ -64,6 +65,7 @@ void saveHist(){
 	//	printf("hello\n");
 	}
 	free(histP);
+	return;
 	/*for(i=0;i<histNo;i++){
 	//	printf("ii%s", histArr[i]);
 		free(histArr[i]);
@@ -104,6 +106,7 @@ void addToHistArr(char *comm){
 void history(char *com, char *tokens[200], int tokenCnt){
 	if(tokenCnt>2){
 		fprintf(stderr,"Jarvish: history: Too many arguments");
+		exitCode = -1;
 		return;
 	}
 	int readNo;
@@ -162,6 +165,7 @@ void loadHist(){
 			histNo=0;
 			return;
 		}
+		exitCode = -1;
 		perror("Jarvish: history");
 		return;
 	}

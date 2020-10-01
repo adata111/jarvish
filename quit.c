@@ -2,15 +2,17 @@
 #include "history.h"
 
 void quit(){
-	saveHist();
+	if(!freed) saveHist();
 	
 	for(int i=0;i<bgCnt;i++){
 		kill(bgP[i].pid, SIGKILL);
 	}
-	for(int i=0;i<30;i++){
+	bgCnt=0;
+	for(int i=0;i<30 && !freed;i++){
 		free(histArr[i]);
 	}
+	freed=1;
 	printf("Bye!\n");
-//	return;
-	exit(0);
+	return;
+//	exit(0);
 }

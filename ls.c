@@ -98,6 +98,7 @@ void ls(char **files, int noOfFiles, int showHid, int showL){
 	    	}
 	    	else{
 
+	    		exitCode = -1;
 	    //		printf("%s\n",files[i]);
 	    		perror("Jarvish: ls");
 	    	}

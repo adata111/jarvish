@@ -59,6 +59,7 @@ int command(char *com,char *inpF,char *outF, int nover){
             {
                 perror("jarvish: Input Redirection");
                 freeToks();
+				exitCode = -1;
                 return 1;
             }
             
@@ -94,6 +95,7 @@ int command(char *com,char *inpF,char *outF, int nover){
             {
                 perror("jarvish: Output Redirection");
                 freeToks();
+				exitCode = -1;
                 return 1;
             }
             
@@ -127,6 +129,7 @@ int command(char *com,char *inpF,char *outF, int nover){
 			else{
 				if(tokenCnt>2){
 					fprintf(stderr,"jarvish: cd: too many arguments\n");
+					exitCode = -1;
 				}
 				else{
 					cd(tokens[1]);
@@ -136,16 +139,18 @@ int command(char *com,char *inpF,char *outF, int nover){
 		else if(strcmp(tokens[0], "pwd")==0){
 			if(getcwd(cwd,2000)==NULL){
 				perror("Get current working directory ERROR");
-				
+				exitCode = -1;
 			}
 			else{
 				printf("%s\n",cwd);
+				exitCode = 5;
 			}
 		}
 		else if(strcmp(tokens[0], "echo")==0){
 
 //				printf("jbkjb%s",comCopy);
 			echo(comCopy);
+			exitCode = 5;
 		}
 		else if(strcmp(tokens[0], "ls")==0){
 			lsSeparate(tokens, tokenCnt);
@@ -153,63 +158,93 @@ int command(char *com,char *inpF,char *outF, int nover){
 		else if(strcmp(tokens[0], "quit")==0 || strcmp(tokens[0],"exit")==0){
 			
 			quit();
-			for(int i=0;i<200;i++){
-			//	if(i==199) printf("freed\n");
-				free(tokens[i]);
-			}
+			
 			run = 0;
-			return 0;
+			
 		}
 		else if(strcmp(tokens[0], "pinfo")==0){
 			pinfo(tokens, tokenCnt);
 		}
 		else if(strcmp(tokens[0], "overkill")==0){
-			if(tokenCnt>1) fprintf(stderr,"jarvish: overkill: Too many arguments detected\n");
+			if(tokenCnt>1) {
+				fprintf(stderr,"jarvish: overkill: Too many arguments detected\n");
+				exitCode = -1;
+			}
 			else overkill();
 		}
 		else if(strcmp(tokens[0], "jobs")==0){
-			if(tokenCnt>1) fprintf(stderr,"jarvish: jobs: Too many arguments detected\n");
+			if(tokenCnt>1) {
+				fprintf(stderr,"jarvish: jobs: Too many arguments detected\n");
+				exitCode = -1;
+			}
 			else jobs();
 		}
 		else if(strcmp(tokens[0], "kjob")==0){
-			if(tokenCnt!=3) fprintf(stderr,"jarvish: kjob: Incorrect number of arguments. Format 'kjob <job number> <signal number>'\n");
+			if(tokenCnt!=3) {
+				fprintf(stderr,"jarvish: kjob: Incorrect number of arguments. Format 'kjob <job number> <signal number>'\n");
+				exitCode = -1;
+			}
 
 			else{ 
-
 				kjob(atoi(tokens[1]),atoi(tokens[2]));
 			}
 		}
 		else if(strcmp(tokens[0], "setenv")==0){
-			if(tokenCnt!=2 && tokenCnt!=3) fprintf(stderr,"jarvish: setenv: Incorrect number of arguments. Format 'setenv var [value]'\n");
+			if(tokenCnt!=2 && tokenCnt!=3) {
+				fprintf(stderr,"jarvish: setenv: Incorrect number of arguments. Format 'setenv var [value]'\n");
+				exitCode = -1;
+			}
 
 			else{ 
 				if(tokenCnt==3){
-					if(setenv(tokens[1],tokens[2],1)<0)
+					if(setenv(tokens[1],tokens[2],1)<0){
 						perror("jarvish: setenv");
+						exitCode = -1;
+					}
+					else
+						exitCode = 5;
 				}
 				else{
-					if(setenv(tokens[1],"",1)<0)
+					if(setenv(tokens[1],"",1)<0){
 						perror("jarvish: setenv");
+						exitCode = -1;
+					}
+					else
+						exitCode = 5;
 				}
 			}
 		}
 		else if(strcmp(tokens[0], "unsetenv")==0){
-			if(tokenCnt!=2) fprintf(stderr,"jarvish: unsetenv: Incorrect number of arguments. Format 'unsetenv var'\n");
+			if(tokenCnt!=2) {
+				fprintf(stderr,"jarvish: unsetenv: Incorrect number of arguments. Format 'unsetenv var'\n");
+				exitCode = -1;
+			}
 
 			else{ 
-				if(unsetenv(tokens[1])<0)
+				if(unsetenv(tokens[1])<0){
 					perror("jarvish: unsetenv");
+					exitCode = -1;
+				}
+				else{
+					exitCode = 5;
+				}
 			}
 		}
 		else if(strcmp(tokens[0], "fg")==0){
-			if(tokenCnt!=2) fprintf(stderr,"jarvish: fg: Incorrect number of arguments. Format 'fg <job number>'\n");
+			if(tokenCnt!=2) {
+				fprintf(stderr,"jarvish: fg: Incorrect number of arguments. Format 'fg <job number>'\n");
+				exitCode = -1;
+			}
 
 			else{ 
 				fg(atoi(tokens[1]));
 			}
 		}
 		else if(strcmp(tokens[0], "bg")==0){
-			if(tokenCnt!=2) fprintf(stderr,"jarvish: bg: Incorrect number of arguments. Format 'bg <job number>'\n");
+			if(tokenCnt!=2) {
+				fprintf(stderr,"jarvish: bg: Incorrect number of arguments. Format 'bg <job number>'\n");
+				exitCode = -1;
+			}
 
 			else{ 
 				bg(atoi(tokens[1]));
@@ -240,7 +275,7 @@ int command(char *com,char *inpF,char *outF, int nover){
 		}
 		fflush(stdout);
 	freeToks();
-	
+	//printf("%d\n", run);
 	if(run) return 1;
 	else return 0;
 	//get the command and arguments

@@ -21,3 +21,6 @@ int run;
 int fgPid;
 int bgCnt;
 char fgName[260];
+char prevwd[2050];
+int freed;
+int exitCode;

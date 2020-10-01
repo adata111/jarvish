@@ -22,8 +22,10 @@ void interr(int interval){
 		retval = select(1, &rfds, NULL, NULL, &tv);
     /* Don’t rely on the value of tv now! */
 
-    if (retval == -1)
+    if (retval == -1){
         perror("select()");
+        exitCode = -1;
+    }
     else if (retval){
      //   printf("Data is available now.\n");
         char c = fgetc(stdin);
@@ -41,6 +43,7 @@ void interr(int interval){
 	FILE *stream = fopen(intrrptFile, "r");
 	if(stream == NULL){
 		perror("jarvish: nightswatch: interrupt");
+		exitCode = -1;
 		return;
 	}
 	else{
@@ -100,8 +103,10 @@ void newb(int interval){
 		retval = select(1, &rfds, NULL, NULL, &tv);
     /* Don’t rely on the value of tv now! */
 
-    if (retval == -1)
+    if (retval == -1){
         perror("select()");
+        exitCode = -1;
+    }
     else if (retval){
      //   printf("Data is available now.\n");
         char c = fgetc(stdin);
@@ -148,6 +153,7 @@ void newb(int interval){
 	    FILE *stream = fopen(loadavgFile, "r");
 		if(stream == NULL){
 			perror("jarvish: nightswatch: newborn");
+			exitCode = -1;
 			return;
 		}
 		else{
@@ -173,6 +179,7 @@ void nightswatch(char *tokens[200], int tokenCnt){
     
 	if(tokenCnt!=4){
 		fprintf(stderr,"jarvish: nightswatch: Incorrect number of arguments provided\n");
+		exitCode = -1;
 		return;
 	}
 	if(strcmp(tokens[3],"interrupt")==0){
@@ -183,5 +190,6 @@ void nightswatch(char *tokens[200], int tokenCnt){
 	}
 	else{
 		fprintf(stderr,"jarvish: nightswatch: Please enter either `interrupt` or `newborn` as command");
+		exitCode = -1;
 	}
 }
