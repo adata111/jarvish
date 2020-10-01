@@ -9,16 +9,16 @@ void ctrlC(int sig){
 //	quit();
 //	prompt();
 //	printf("\n");
-	if(fgPid==-1){}
+	if(fgT.pid==-1){}
 	else{
-		kill(fgPid,SIGINT);
+		kill(fgT.pid,SIGINT);
 		exitCode = -1;
-		fgPid=-1;
+		fgT.pid=-1;
 	}
 }
 void ctrlZ(int sig){
-	kill(fgPid,SIGSTOP);
-	fgPid=-1;
+	kill(fgT.pid,SIGSTOP);
+	fgT.pid=-1;
 }
 
 char miniCom[20][2000];
@@ -76,8 +76,8 @@ int main()
 	exitCode=0;
     while (1)
     {
-    	fgPid=-1;
-    //	printf("%d\n", exitCode);
+    	fgT.pid=-1;
+   // 	printf("hi%d\n", exitCode);
         prompt();
         exitCode = 5;
         // TAKE INPUT HERE
@@ -102,6 +102,8 @@ int main()
         	free(input);
         	break;
         }
+   // 	printf("b%d\n", exitCode);
+    	fflush(stdout);
         strcpy(inp,input);
         //inp = strtok(input,"\n");
     //   printf("%s\n", inp);
@@ -111,6 +113,7 @@ int main()
       //  printf("h %s\n", input);
       //  for(int i=0;i<10;i++){}
         char* token = strtok(input, ";\n");
+    //	printf("by%d\n", exitCode);
         
         int numCom = 0;  
         while (token != NULL) { 
@@ -159,7 +162,7 @@ int main()
 			}
 			
 		}
-		exitCode=cumExit;
+	//	if(cumExit!=0) exitCode=cumExit;
 		if(x==0) break;
     //	printf("run=%d\n",x);
 

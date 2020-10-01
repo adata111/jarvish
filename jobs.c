@@ -40,6 +40,6 @@ void jobs(){
 	for(int i=0;i<bgCnt;i++){
 		printf("[%d] ", (i+1));
 		getStat(bgP[i].pid);
-		printf(" %s [%d]\n", bgP[i].name, bgP[i].pid);
+		printf(" %s [%d]\n", bgP[i].fullN, bgP[i].pid);
 	}
 }

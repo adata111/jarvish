@@ -16,6 +16,7 @@ char *delBg(pid_t pid){
                 for(int j=i; j < bgCnt-1; j++)
 			    {
 			         strcpy(bgP[i].name, bgP[i+1].name);
+			         strcpy(bgP[i].fullN, bgP[i+1].fullN);
 			         bgP[i].pid = bgP[i+1].pid;
 			    }
      
@@ -37,6 +38,7 @@ void childHandler(int sig){
         if(WIFEXITED(childStatus)){
         	if(WEXITSTATUS(childStatus) == 0){
         		fprintf(stderr,"\033[0;91m\n%s with pid %d exited normally\n\033[0m", proc, pid);
+        		exitCode = 5;
         		fflush(stdout);
     		//	prompt();
         	}
@@ -118,8 +120,13 @@ void executeSys(char *tokens[200], int tokenCnt, int backgnd){
 			//	perror("tcsetpgrp 1");
 			//	exit(1);
 			}
-			fgPid=forkRet;
-			strcpy(fgName,tokens[0]);
+			fgT.pid=forkRet;
+			strcpy(fgT.name,tokens[0]);
+			strcpy(fgT.fullN, tokens[0]);
+			for(int y = 1;y<tokenCnt ; y++){
+				strcat(fgT.fullN, " ");
+				strcat(fgT.fullN, tokens[y]);
+			}
 			int wpid = waitpid(forkRet, &status, WUNTRACED);
 
 			/* Children completed: put the shell back in the foreground.  */
@@ -146,8 +153,13 @@ void executeSys(char *tokens[200], int tokenCnt, int backgnd){
 			if( WIFSTOPPED(status) ){
 				strcpy(bgP[bgCnt].name, tokens[0]);
 				bgP[bgCnt].pid = forkRet;
+				strcpy(bgP[bgCnt].fullN, tokens[0]);
+				for(int y = 1;y<tokenCnt ; y++){
+					strcat(bgP[bgCnt].fullN, " ");
+					strcat(bgP[bgCnt].fullN, tokens[y]);
+				}
 				bgCnt++;
-				printf("\033[0;91m\nChild process %s with process id %d stopped and sent to background\n\033[0m",fgName,fgPid);
+				printf("\033[0;91m\nChild process %s with process id %d stopped and sent to background\n\033[0m",fgT.name,fgT.pid);
 				exitCode = -2;
 			}
 
@@ -155,6 +167,12 @@ void executeSys(char *tokens[200], int tokenCnt, int backgnd){
 		else{
 			strcpy(bgP[bgCnt].name, tokens[0]);
 			bgP[bgCnt].pid = forkRet;
+			strcpy(bgP[bgCnt].fullN, tokens[0]);
+		//	printf("%d\n", tokenCnt);
+			for(int y = 1;y<tokenCnt-1 ; y++){
+				strcat(bgP[bgCnt].fullN, " ");
+				strcat(bgP[bgCnt].fullN, tokens[y]);
+			}
 			bgCnt++;
 			printf("[%d] %d\n", bgCnt, forkRet);
 
@@ -169,7 +187,7 @@ void executeSys(char *tokens[200], int tokenCnt, int backgnd){
    }*/
 		}   
 	}
-	if(exitCode > 0 ){
+	if(exitCode >= 0 ){
 		exitCode = 5;
 	}
 }

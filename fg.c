@@ -19,11 +19,12 @@ void fg(int jobnum){
 				exitCode = -2;
 				return;
 			}
-			fgPid=bgP[jobnum-1].pid;
-			strcpy(fgName,bgP[jobnum-1].name);
-			char *proc = delBg(fgPid);
+			fgT.pid=bgP[jobnum-1].pid;
+			strcpy(fgT.name,bgP[jobnum-1].name);
+			strcpy(fgT.fullN,bgP[jobnum-1].fullN);
+			char *proc = delBg(fgT.pid);
 
-			int wpid = waitpid(fgPid, &status, WUNTRACED);
+			int wpid = waitpid(fgT.pid, &status, WUNTRACED);
 			free(proc);
 			/* Children completed: put the shell back in the foreground.  */
 			if( tcsetpgrp (STDIN_FILENO, getpgrp()) < 0) {
@@ -46,10 +47,11 @@ void fg(int jobnum){
 	        	exitCode = -2;
 	        }
 			if( WIFSTOPPED(status) ){
-				strcpy(bgP[bgCnt].name, fgName);
-				bgP[bgCnt].pid = fgPid;
+				strcpy(bgP[bgCnt].name, fgT.name);
+				strcpy(bgP[bgCnt].fullN, fgT.fullN);
+				bgP[bgCnt].pid = fgT.pid;
 				bgCnt++;
-				printf("\033[0;91m\n%s with pid %d stopped and sent to background\n\033[0m",fgName,fgPid);
+				printf("\033[0;91m\n%s with pid %d stopped and sent to background\n\033[0m",fgT.name,fgT.pid);
 				exitCode = -1;
 			}
 	}
