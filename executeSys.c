@@ -127,6 +127,7 @@ void executeSys(char *tokens[200], int tokenCnt, int backgnd){
 			//	perror("tcsetpgrp 2");
 			//	exit(1);
 			}
+			//if(status != 0) exitCode= -2;
 			if(WIFEXITED(status)){
 	        	if(WEXITSTATUS(status) == 0){
 	        	//	printf("normal exit\n");

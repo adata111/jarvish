@@ -12,6 +12,7 @@ void ctrlC(int sig){
 	if(fgPid==-1){}
 	else{
 		kill(fgPid,SIGINT);
+		exitCode = -1;
 		fgPid=-1;
 	}
 }
@@ -76,7 +77,7 @@ int main()
     while (1)
     {
     	fgPid=-1;
-
+    //	printf("%d\n", exitCode);
         prompt();
         exitCode = 5;
         // TAKE INPUT HERE
@@ -96,14 +97,16 @@ int main()
 				 	free(histArr[i]);
 				 }
         		perror("Jarvish: input");
+        		exitCode = -1;
         	}
         	free(input);
         	break;
         }
         strcpy(inp,input);
         //inp = strtok(input,"\n");
-    //    printf("%s\n", inp);
+    //   printf("%s\n", inp);
     //    for(int i=0;i<10;i++){}
+        exitCode = 5;
         addToHistArr(inp);
       //  printf("h %s\n", input);
       //  for(int i=0;i<10;i++){}
@@ -120,6 +123,7 @@ int main()
 		} 
     	free(input);
 		//printf("%c\n",lilCom[numCom][1]);
+
 		int x=5;int j=0;int cumExit;
 		for(int i=0;i<numCom;i++){
 	//		printf("%s\n",lilCom[i]);

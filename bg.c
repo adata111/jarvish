@@ -6,7 +6,8 @@ void bg(int jobnum){
 		exitCode = -1;
 	}
 	else {
-			kill(bgP[jobnum-1].pid,SIGCONT);
-			exitCode = 5;
+			if(kill(bgP[jobnum-1].pid,SIGCONT)<0)
+				exitCode=-1;
+			else exitCode = 5;
 		}
 }

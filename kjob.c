@@ -10,6 +10,9 @@ void kjob(int jobnum, int signum){
 		exitCode = -1;
 	}
 	else{
-		kill(bgP[jobnum-1].pid,signum);
+		if(kill(bgP[jobnum-1].pid,signum)<0){
+			perror("Jarvish: error");
+			exitCode = -1;
+		}
 	}
 }

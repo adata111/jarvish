@@ -63,7 +63,11 @@ int command(char *com,char *inpF,char *outF, int nover){
                 return 1;
             }
             
-            dup2(fd_in, 0);         
+            if(dup2(fd_in, 0)<0){
+            	perror("jarvish: inp dup2");
+            	exitCode=-1;
+            	return 1;
+            }         
             close(fd_in);
 	}
 
@@ -98,8 +102,11 @@ int command(char *com,char *inpF,char *outF, int nover){
 				exitCode = -1;
                 return 1;
             }
-            
-            dup2(fd_out, 1);         
+            if(dup2(fd_out, 1)<0){
+            	perror("jarvish: outp dup2");
+            	exitCode = -1;
+            	return 1;
+            }       
             close(fd_out);
 	}
 
@@ -114,6 +121,7 @@ int command(char *com,char *inpF,char *outF, int nover){
 		redir(tokens, tokenCnt);
 	}
 */
+	if(tokenCnt>0){
 	 if(strcmp(tokens[tokenCnt-1],"&")==0){
 		executeSys(tokens, tokenCnt, 1);
 	}
@@ -264,13 +272,21 @@ int command(char *com,char *inpF,char *outF, int nover){
 
 	}	
 	}
-
+	}
 	if(strcmp(outF,"")){
-			dup2(backup_out,1);
+			if(dup2(backup_out, 1)<0){
+            	perror("jarvish: stdout dup2");
+            	exitCode=-1;
+            	return 1;
+            }
 			close(backup_out);
 		}
 		if(strcmp(inpF,"")){
-			dup2(backup_in,0);
+			if(dup2(backup_in, 0)<0){
+            	perror("jarvish: stdin dup2");
+            	exitCode=-1;
+            	return 1;
+            }
 			close(backup_in);
 		}
 		fflush(stdout);

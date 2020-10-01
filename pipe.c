@@ -35,6 +35,7 @@ int pip(char *comm){
 		if(forkRet<0){
 			exitCode = -1;
 			perror("Pipe fork");
+			exit(1);
 		}
 		else if(forkRet>0){
 			//parent - write to pipe

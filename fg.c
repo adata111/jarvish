@@ -14,7 +14,11 @@ void fg(int jobnum){
 			//	exit(1);
 			}
 			int status;
-			kill(bgP[jobnum-1].pid,SIGCONT);
+			if(kill(bgP[jobnum-1].pid,SIGCONT)<0){
+				perror("kill");
+				exitCode = -2;
+				return;
+			}
 			fgPid=bgP[jobnum-1].pid;
 			strcpy(fgName,bgP[jobnum-1].name);
 			char *proc = delBg(fgPid);

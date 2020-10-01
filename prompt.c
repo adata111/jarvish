@@ -4,7 +4,7 @@
 extern int errno;
 
 void welc(){
-printf("\033[1;96m\n\t       __   ___      ____ _    __  _____  _____ __  __\n");
+printf("\033[1;96m\t       __   ___      ____ _    __  _____  _____ __  __\n");
   printf("\t      / /  /   |    / __ \\ |  / / /_  _/ / ___// / / /\n");
   printf("\t __  / /  / /| |   / /_/ / | / /   / /   \\__ \\/ /_/ / \n");
   printf("\t/ /_/ /_ / ___ |_ / _, _/| |/ /_ _/ / _ ___/ / __  /_ \n");
@@ -19,6 +19,7 @@ void prompt() {
 	dir=(char *)malloc(2000);
 	if(getcwd(cwd,2000)==NULL){
 		perror("Get current working directory ERROR");
+		exitCode = -1;
 		exit(1);
 	}
 	strcpy(dir,cwd);
