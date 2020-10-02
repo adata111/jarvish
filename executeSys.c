@@ -142,12 +142,12 @@ void executeSys(char *tokens[200], int tokenCnt, int backgnd){
 	        	}
 	     
 	        	else {
-	        	//	printf("not normal exit stat\n");
+	        //		printf("not normal exit stat\n");
 	        		exitCode = -2;
 	        	}
 	        }
 	        else{
-	        	//printf("not normal exit\n");
+	        //	printf("not normal exit\n");
 	        	exitCode = -2;
 	        }
 			if( WIFSTOPPED(status) ){
@@ -177,7 +177,7 @@ void executeSys(char *tokens[200], int tokenCnt, int backgnd){
 			printf("[%d] %d\n", bgCnt, forkRet);
 
 			if(strcmp(tokens[0],"vi")==0 || !(strcmp(tokens[0],"vim"))){
-				kill(forkRet, SIGSTOP);
+			//	kill(forkRet, SIGSTOP);
 			}
 	/*		if (WIFEXITED(status) != 0) {
       printf("process %d exited normally\n", forkRet);

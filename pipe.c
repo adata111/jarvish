@@ -21,12 +21,13 @@ int pip(char *comm){
 	int fd[2];
 	pid_t childPid;
 	int s;
+	x=1;
 //	backup_in=dup(STDIN_FILENO);
 	for(int i=0;i<pipCnt;i++){
 		if(pipe(fd)<0){
 			perror("Pipe");
 			exitCode = -1;
-			exit(1);
+			break;
 		}
 		else{
 			exitCode = 5;
@@ -35,7 +36,7 @@ int pip(char *comm){
 		if(forkRet<0){
 			exitCode = -1;
 			perror("Pipe fork");
-			exit(1);
+			break;
 		}
 		else if(forkRet>0){
 			//parent - write to pipe
@@ -55,10 +56,23 @@ int pip(char *comm){
 			//child - read from pipe
 		//	close(fd[0]);
 			if(i!=0)
-			dup2(s,0);	//replace stdin of pipe rhs with read end of lhs
+			if(dup2(s,0)<0){	//replace stdin of pipe rhs with read end of lhs
+				perror("dup2 stdin");
+				exitCode = -1;
+				close(fd[1]);
+				close(fd[0]);
+				exit(1);
+			}
+			
 			if(i<pipCnt-1){
 			//	printf("%s\n", pipToks[i]);
-				dup2(fd[1],1); //replace stdout of lhs with write end of rhs
+				if(dup2(fd[1],1)<0){ //replace stdout of lhs with write end of rhs
+					perror("dup2 stdin");
+					exitCode = -1;
+					close(fd[1]);
+					close(fd[0]);
+					exit(1);
+				}
 			}
 			if(!chkRedir(pipToks[i]))//input from fd[0]
 			 x=0;

@@ -47,6 +47,7 @@ Jarvish
 *.mod*
 *.cmd
 *.txt
+
 .tmp_versions/
 modules.order
 Module.symvers

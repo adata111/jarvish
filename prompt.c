@@ -23,6 +23,7 @@ void prompt() {
 		exit(1);
 	}
 	strcpy(dir,cwd);
+//	printf("%d\n", exitCode);
 	if(exitCode < 0){
 		printf(":'(");
 	}

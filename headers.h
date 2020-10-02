@@ -24,3 +24,4 @@ int bgCnt;
 char prevwd[2050];
 int freed;
 int exitCode;
+pid_t jarvPid;

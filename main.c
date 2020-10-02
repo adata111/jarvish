@@ -9,20 +9,47 @@ void ctrlC(int sig){
 //	quit();
 //	prompt();
 //	printf("\n");
+	pid_t nowP = getpid();
+	if(nowP<0){
+		perror("getpid");
+		exitCode = -1;
+		return;
+	}
+	else if(nowP != jarvPid)
+		return;
 	if(fgT.pid==-1){}
 	else{
 		kill(fgT.pid,SIGINT);
 		exitCode = -1;
 		fgT.pid=-1;
 	}
+	signal(SIGINT, ctrlC);
 }
+
 void ctrlZ(int sig){
-	kill(fgT.pid,SIGSTOP);
+	pid_t nowP = getpid();
+	if(nowP<0){
+		perror("getpid");
+	//	exitCode = -1;
+		return;
+	}
+	else if(nowP != jarvPid)
+		return;
+
+	if(fgT.pid!=-1){
+		if(kill(fgT.pid,SIGSTOP)<0){
+			perror("kill");
+		}
+		else{
+			exitCode=-1;
+		}
+	}
 	fgT.pid=-1;
 }
 
 char miniCom[20][2000];
 int num;int op[25];
+
 char **chain(char *lilCom){
 	char *copy = (char *)calloc(2000,sizeof(char));
 	strcpy(copy,lilCom);
@@ -50,6 +77,7 @@ char **chain(char *lilCom){
 int main()
 {
 	welc();
+	jarvPid = getpid();
 	gethostname(host,sizeof(host));
 	getlogin_r(user,sizeof(user));
 	if(getcwd(myhome,sizeof(myhome))==NULL){
@@ -87,7 +115,7 @@ int main()
      //   printf("\nSTDIN_FILENO %d\n",STDIN_FILENO);
         if(getline(&input,&inpSize,stdin)==-1){
         //	printf("%s %ld\n",input,inpSize);
-        	if(errno==0){
+        	if(errno>=0){
 
         		printf("\n");
         		quit();
@@ -96,6 +124,7 @@ int main()
         		for(int i=0;i<30;i++){
 				 	free(histArr[i]);
 				 }
+			//	 printf("%d\n", errno);
         		perror("Jarvish: input");
         		exitCode = -1;
         	}

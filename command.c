@@ -64,7 +64,7 @@ int command(char *com,char *inpF,char *outF, int nover){
             }
             
             if(dup2(fd_in, 0)<0){
-            	perror("jarvish: inp dup2");
+            	perror("jarvish: inp file dup2");
             	exitCode=-1;
             	return 1;
             }         
@@ -103,7 +103,7 @@ int command(char *com,char *inpF,char *outF, int nover){
                 return 1;
             }
             if(dup2(fd_out, 1)<0){
-            	perror("jarvish: outp dup2");
+            	perror("jarvish: outp file dup2");
             	exitCode = -1;
             	return 1;
             }       
