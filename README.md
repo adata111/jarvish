@@ -3,12 +3,16 @@
 
 A very basic version of shell implemented in C.
 
+<img src="/screenshots/jarvish1.png"/>
+
 ## Run the shell
 
 1. Run the command `make`.
 2. Run `./Jarvish` to get a banner with "J.A.R.V.I.SH." written followed by a prompt of the form `<username@system_name:path>` highlighted in cyan. The directory from where the shell is executed is the home(~) directory for the shell
 3. Run any command in the shell. It can entail as many number of tabs and spaces, the shell accounts for those.
 4. In order to exit, run `quit` or `exit` or `ctrl+C`.
+
+<img src="/screenshots/jarvish2.png"/>
 
 ## Commands
 
