@@ -66,7 +66,6 @@ void pinfo(char *tokens[200], int tokenCnt){
 		pid = getpid();
 	}
 	else if(tokenCnt==2){
-	//	pid = tokens[1];
 		pid = atoi(tokens[1]);
 	}
 	else{
@@ -76,6 +75,5 @@ void pinfo(char *tokens[200], int tokenCnt){
 	}
 
 	readStat(pid);
-//	readExec(pid);
 
 }

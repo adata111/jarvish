@@ -2,12 +2,8 @@
 #include "command.h"
 
 void cd(char *newDir){
-	//=strtok(newDir,"\n");
-//	strcpy(token,newDir);
-//	printf("%s\n",newDir);
 	if(strcmp(newDir,"-")==0){
 		char shortP[2000];
-	//	printf("hi\n");
 		if(strstr(prevwd,myhome)==NULL)
 			strcpy(shortP,prevwd);
 		else{
@@ -15,7 +11,6 @@ void cd(char *newDir){
 			strcat(shortP,(prevwd+strlen(myhome)));
 		}
 		printf("%s\n",shortP);
-		//printf("%s\n",prevwd);
 		
 		if(chdir(prevwd)==0){
 			strcpy(prevwd,cwd);
@@ -32,7 +27,6 @@ void cd(char *newDir){
 		if(chdir(myhome)==0){
 			strcpy(prevwd,cwd);
 			exitCode = 5;
-		//	strcpy(prevwd,temp);
 		}
 		else{
 			fprintf(stderr,"Jarvish: cd: ");
@@ -43,13 +37,11 @@ void cd(char *newDir){
 	}
 	else if(newDir[0]=='~'){
 		char fullP[3000];
-	//	printf("hi\n");
 		strcpy(fullP,myhome);
 		strcat(fullP,(newDir+1));
 		if(chdir(fullP)==0){
 			strcpy(prevwd,cwd);
 			exitCode = 5;
-		//	strcpy(prevwd,temp);
 		}
 		else{
 			fprintf(stderr,"Jarvish: cd: ");
@@ -62,7 +54,6 @@ void cd(char *newDir){
 		if(chdir(newDir)==0){
 			strcpy(prevwd,cwd);
 			exitCode = 5;
-		//	strcpy(prevwd,temp);
 		}
 		else{
 			fprintf(stderr,"Jarvish: cd: ");

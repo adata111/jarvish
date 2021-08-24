@@ -10,8 +10,6 @@ void fg(int jobnum){
 		signal (SIGCHLD, childHandler);
 		/* transfer controlling terminal */
 			if ( tcsetpgrp (STDIN_FILENO, getpgid(bgP[jobnum-1].pid)) < 0) { /* we also do this in child */
-			//	perror("tcsetpgrp 1");
-			//	exit(1);
 			}
 			int status;
 			if(kill(bgP[jobnum-1].pid,SIGCONT)<0){
@@ -28,8 +26,6 @@ void fg(int jobnum){
 			free(proc);
 			/* Children completed: put the shell back in the foreground.  */
 			if( tcsetpgrp (STDIN_FILENO, getpgrp()) < 0) {
-			//	perror("tcsetpgrp 2");
-			//	exit(1);
 			}
 			if(WIFEXITED(status)){
 	        	if(WEXITSTATUS(status) == 0){

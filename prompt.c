@@ -13,7 +13,6 @@ printf("\033[1;96m\t       __   ___      ____ _    __  _____  _____ __  __\n");
 }
 
 void prompt() {
-//	welc();
 	char *promptLine,*dir;
 
 	dir=(char *)malloc(2000);
@@ -23,7 +22,6 @@ void prompt() {
 		exit(1);
 	}
 	strcpy(dir,cwd);
-//	printf("%d\n", exitCode);
 	if(exitCode < 0){
 		printf(":'(");
 	}
@@ -42,6 +40,5 @@ void prompt() {
 		printf("\033[1;96m<%s@%s:%s>\033[0m",user,host,dir);	
 	}
 	free(dir);
-//	printf("%s@%s:~",user,host);
 	fflush(stdout);
 }

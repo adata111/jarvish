@@ -14,5 +14,4 @@ void quit(){
 	freed=1;
 	printf("Bye!\n");
 	return;
-//	exit(0);
 }

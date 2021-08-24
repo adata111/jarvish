@@ -11,17 +11,17 @@
 #include<dirent.h>
 #include<stdbool.h>
 
-char host[1030], user[1030], cwd[2050], myhome[2050];
+char host[1030], user[1020], cwd[2050], myhome[2050];
 typedef struct bgTask{
 	char fullN[2000];
 	char name[200];
 	pid_t pid;
 }bgTask;
 bgTask bgP[200];
-bgTask fgT;
+bgTask fgT;		//the current foreground task
 int run;
 int bgCnt;
-char prevwd[2050];
+char prevwd[2050];  //previous working directory
 int freed;
 int exitCode;
 pid_t jarvPid;

@@ -4,26 +4,23 @@
 #include "history.h"
 
 void ctrlC(int sig){
-//	printf("ctrl C\n");
-//	printf("%d\n",getpid());
-//	quit();
-//	prompt();
-//	printf("\n");
-	pid_t nowP = getpid();
+	pid_t nowP = getpid();		//id of the process that called ctrlC
 	if(nowP<0){
 		perror("getpid");
 		exitCode = -1;
 		return;
 	}
-	else if(nowP != jarvPid)
+	else if(nowP != jarvPid)	// if the shell didnt call it then don't do anything
+		// we just needd to kill child processes not the shell itself
 		return;
-	if(fgT.pid==-1){}
+	if(fgT.pid==-1){}	// error handling, fgT.pid is initialized with -1
 	else{
+		// kill fg process
 		kill(fgT.pid,SIGINT);
 		exitCode = -1;
 		fgT.pid=-1;
 	}
-	signal(SIGINT, ctrlC);
+	signal(SIGINT, ctrlC);	//let parent know that the child died
 }
 
 void ctrlZ(int sig){
@@ -77,7 +74,7 @@ char **chain(char *lilCom){
 int main()
 {
 	welc();
-	jarvPid = getpid();
+	jarvPid = getpid();  // pid of jarvish
 	gethostname(host,sizeof(host));
 	getlogin_r(user,sizeof(user));
 	if(getcwd(myhome,sizeof(myhome))==NULL){
@@ -93,11 +90,6 @@ int main()
 	bgCnt=0;
 	loadHist();
 	char lilCom[100][2000];
-	/*for(int i=0;i<256;i++){
-		lilCom[i] = (char *)malloc(2000 * sizeof(char));
-	}*/
-//	printf("%s@%s:~%s",user,host,myhome);
-//	fflush(stdout);
 	run=1;
 	signal(SIGINT, ctrlC);
 	signal(SIGTSTP, ctrlZ);
@@ -105,16 +97,13 @@ int main()
     while (1)
     {
     	fgT.pid=-1;
-   // 	printf("hi%d\n", exitCode);
         prompt();
         exitCode = 5;
         // TAKE INPUT HERE
         size_t inpSize = 0;
         char *input; char inp[2000];
         input= (char *)malloc(2000 * sizeof(char));
-     //   printf("\nSTDIN_FILENO %d\n",STDIN_FILENO);
         if(getline(&input,&inpSize,stdin)==-1){
-        //	printf("%s %ld\n",input,inpSize);
         	if(errno>=0){
 
         		printf("\n");
@@ -131,34 +120,23 @@ int main()
         	free(input);
         	break;
         }
-   // 	printf("b%d\n", exitCode);
     	fflush(stdout);
         strcpy(inp,input);
-        //inp = strtok(input,"\n");
-    //   printf("%s\n", inp);
-    //    for(int i=0;i<10;i++){}
         exitCode = 5;
         addToHistArr(inp);
-      //  printf("h %s\n", input);
-      //  for(int i=0;i<10;i++){}
         char* token = strtok(input, ";\n");
-    //	printf("by%d\n", exitCode);
         
         int numCom = 0;  
         while (token != NULL) { 
-		//	command(token); 
-		//	printf("%s\n",token );
 			strcpy(lilCom[numCom],token);
 			++numCom;
 			token = strtok(NULL, ";\n"); 
 			
 		} 
     	free(input);
-		//printf("%c\n",lilCom[numCom][1]);
 
 		int x=5;int j=0;int cumExit;
 		for(int i=0;i<numCom;i++){
-	//		printf("%s\n",lilCom[i]);
 			exitCode=5;
 			chain(lilCom[i]);//split based on and or, and store and or in order, then execute following commands
 			for(j=0;j<num;j++){
@@ -185,22 +163,12 @@ int main()
 					cumExit=exitCode;
 				}
 
-				//else break;
-	//			printf("%d\n", x);
 				if(x==0) return 0;
 			}
 			
 		}
-	//	if(cumExit!=0) exitCode=cumExit;
 		if(x==0) break;
-    //	printf("run=%d\n",x);
 
     }
-//    printf("end\n");
-	/*for(int i=1;i<20;i++){
-		printf("%d\n",i);
-	 	free(histArr[i]);
-	//	free(lilCom[i]);
-	}*/
     return 0;
 }

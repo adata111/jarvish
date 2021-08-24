@@ -35,11 +35,7 @@ void interr(int interval){
 			return;
 		}
     }
-        /* FD_ISSET(0, &rfds) will be true. */
     else{
-      //  printf("No data within five seconds.\n");
-	//	printf("printing every 2 sec\n");
-	//	fflush(stdout);
 	FILE *stream = fopen(intrrptFile, "r");
 	if(stream == NULL){
 		perror("jarvish: nightswatch: interrupt");
@@ -74,11 +70,6 @@ void interr(int interval){
 		fclose(stream);
 	}
 	}
-//	getline(&input,&inpSize,stdin);
-//	char c = fgetc(stdin);
-//	if(c=='q'){
-//		return;
-//	}
 	sleep(interval);
 	}
 }
@@ -118,39 +109,7 @@ void newb(int interval){
     }
         /* FD_ISSET(0, &rfds) will be true. */
     else{
-      //  printf("No data within five seconds.\n");
-	//	printf("printing every 2 sec\n");
-	//	fflush(stdout);
-	/*	struct dirent **namelist;
-		n = scandir("/proc", &namelist, NULL, alphasort);
-		if (n == -1) {
-	    	perror("jarvish: proc directory");
-	    }
-	    else{
-
-
-	    	for(j=0;j<n;j++) {
-	//	    	printf("to print list");
-		    	char *name = namelist[j]->d_name;
-		    //	printf("%s\n",name);
-		    //	if(name[0]>'9'){
-		    //		break;
-		    //	}
-		    	for(k=0;k<strlen(name);k++){
-		    		if(name[k]>='0' && name[k]<='9'){
-		    			continue;
-		    		}
-		    		else break;
-		    	}
-		    	if(k==strlen(name)){
-		    		x=atoi(name);
-		    		if(maxi<x) maxi=x;
-		    	}
-		    }
-		    printf("%d\n",maxi);
-	    }
-	    */
-	    FILE *stream = fopen(loadavgFile, "r");
+        FILE *stream = fopen(loadavgFile, "r");
 		if(stream == NULL){
 			perror("jarvish: nightswatch: newborn");
 			exitCode = -1;
@@ -165,11 +124,6 @@ void newb(int interval){
 			}
 		}
 	}
-//	getline(&input,&inpSize,stdin);
-//	char c = fgetc(stdin);
-//	if(c=='q'){
-//		return;
-//	}
 	sleep(interval);
 	}
 }

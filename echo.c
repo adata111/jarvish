@@ -1,7 +1,6 @@
 #include "headers.h"
 
 void echo(char *toPrint){
-//	printf("%s\n",toPrint);
 	char *token = strtok(toPrint, " ");
 	token = strtok(NULL, " "); 
 		if(token!=NULL){

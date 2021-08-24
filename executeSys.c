@@ -29,18 +29,21 @@ char *delBg(pid_t pid){
 
 void childHandler(int sig){
 	int childStatus;
-    pid_t pid = waitpid(-1, &childStatus, WNOHANG);
-//    printf("process %d exited normally\n", pid);
+    pid_t pid = waitpid(-1, &childStatus, WNOHANG);		// waitpid waits for any child process to end
+	/* WNOHANG
+    Demands status information immediately. If status information is immediately available on an appropriate child process, 
+	waitpid() returns this information. Otherwise, waitpid() returns immediately with an error code indicating that 
+	the information was not available. In other words, WNOHANG checks child processes without causing the caller to be suspended.
+	*/
+
     if(pid > 0)
     {
         char * proc = delBg(pid);
-    //   printf("process %d exited normally %d\n", pid,childStatus);
-        if(WIFEXITED(childStatus)){
+        if(WIFEXITED(childStatus)){		//if child exited normally
         	if(WEXITSTATUS(childStatus) == 0){
         		fprintf(stderr,"\033[0;91m\n%s with pid %d exited normally\n\033[0m", proc, pid);
         		exitCode = 5;
         		fflush(stdout);
-    		//	prompt();
         	}
      
         	else {
@@ -59,17 +62,15 @@ void childHandler(int sig){
         free(proc);
 
     }
-	//if(bg) prompt();
     return;
 }
 
 void executeSys(char *tokens[200], int tokenCnt, int backgnd){
 	is_bg=backgnd;
-	 signal (SIGQUIT, SIG_IGN);
-           signal (SIGTSTP, SIG_IGN);
-           signal (SIGTTIN, SIG_IGN);
-           signal (SIGTTOU, SIG_IGN);
-//	printf("pgrp=%d pid=%d term=%d\n", getpgrp(), getpid(), tcgetpgrp(STDIN_FILENO));
+	signal (SIGQUIT, SIG_IGN);
+	signal (SIGTSTP, SIG_IGN);
+	signal (SIGTTIN, SIG_IGN);
+	signal (SIGTTOU, SIG_IGN);
 	if(!backgnd)
 		tokens[tokenCnt]=NULL;
 	else
@@ -83,74 +84,65 @@ void executeSys(char *tokens[200], int tokenCnt, int backgnd){
 	else if(forkRet == 0){
 		//kiddo
 		signal (SIGQUIT, SIG_DFL);
-           signal (SIGTSTP, SIG_DFL);
-           signal (SIGTTIN, SIG_DFL);
-           signal (SIGTTOU, SIG_DFL);
-           signal (SIGINT, SIG_DFL);
+		signal (SIGTSTP, SIG_DFL);
+		signal (SIGTTIN, SIG_DFL);
+		signal (SIGTTOU, SIG_DFL);
+		signal (SIGINT, SIG_DFL);
 		if(backgnd) 
 			setpgid(0,0);
-			if(!backgnd){
-			/* transfer controlling terminal */
-		if( tcsetpgrp (STDIN_FILENO, getpgrp()) < 0) {
-		//	perror("child tcsetpgrp");
-		//	exit(1);
-			//bash checks if input is coming from terminal and hence throws error in case of piping
+		if(!backgnd){
+			/* transfer controlling terminal 
+			stdin is assigned same process group id as this child */
+			if( tcsetpgrp (STDIN_FILENO, getpgrp()) < 0) {
+			}
 		}
-	}
-	//	printf("pgrp=%d pid=%d term=%d\n", getpgrp(), getpid(), tcgetpgrp(STDIN_FILENO));
 		if(execvp(tokens[0],tokens)==-1){
 			fprintf(stderr,"Jarvish: %s: Oops! Command not found :(\n",tokens[0]);
 			freeToks();
 			exitCode = -2;
 			exit(1);
-		//	return;
 		}
 
 	}	
 	else{
 		//parent
-		//setpgid(forkRet, forkRet);
-		signal (SIGCHLD, childHandler);
+		signal (SIGCHLD, childHandler);		//when parent gets to know child died, execute childHandler
 		int status;
 
 		if(!backgnd){
-	//	wait(NULL);
-			/* transfer controlling terminal */
+			/* transfer controlling terminal
+			stdin is assigned the same process group id as the child */
 			if ( tcsetpgrp (STDIN_FILENO, getpgid(forkRet)) < 0) { // we also do this in child 
-			//	perror("tcsetpgrp 1");
-			//	exit(1);
+			
 			}
-			fgT.pid=forkRet;
+			fgT.pid=forkRet;	// child is the fg process now
 			strcpy(fgT.name,tokens[0]);
 			strcpy(fgT.fullN, tokens[0]);
 			for(int y = 1;y<tokenCnt ; y++){
 				strcat(fgT.fullN, " ");
 				strcat(fgT.fullN, tokens[y]);
 			}
-			int wpid = waitpid(forkRet, &status, WUNTRACED);
+			int wpid = waitpid(forkRet, &status, WUNTRACED);	// wait for child to get over
+			// WUNTRACED - Reports on stopped child processes as well as terminated ones. 
 
 			/* Children completed: put the shell back in the foreground.  */
 			if( tcsetpgrp (STDIN_FILENO, getpgrp()) < 0) {
-			//	perror("tcsetpgrp 2");
-			//	exit(1);
 			}
-			//if(status != 0) exitCode= -2;
+
+			// check the exit status of child to decide the exitCode
 			if(WIFEXITED(status)){
 	        	if(WEXITSTATUS(status) == 0){
-	        	//	printf("normal exit\n");
 	        		exitCode = 5;
 	        	}
 	     
 	        	else {
-	        //		printf("not normal exit stat\n");
 	        		exitCode = -2;
 	        	}
 	        }
 	        else{
-	        //	printf("not normal exit\n");
 	        	exitCode = -2;
 	        }
-			if( WIFSTOPPED(status) ){
+			if( WIFSTOPPED(status) ){	// ctrl Z
 				strcpy(bgP[bgCnt].name, tokens[0]);
 				bgP[bgCnt].pid = forkRet;
 				strcpy(bgP[bgCnt].fullN, tokens[0]);
@@ -165,10 +157,10 @@ void executeSys(char *tokens[200], int tokenCnt, int backgnd){
 
 		}
 		else{
+			// background process
 			strcpy(bgP[bgCnt].name, tokens[0]);
 			bgP[bgCnt].pid = forkRet;
 			strcpy(bgP[bgCnt].fullN, tokens[0]);
-		//	printf("%d\n", tokenCnt);
 			for(int y = 1;y<tokenCnt-1 ; y++){
 				strcat(bgP[bgCnt].fullN, " ");
 				strcat(bgP[bgCnt].fullN, tokens[y]);
@@ -176,15 +168,9 @@ void executeSys(char *tokens[200], int tokenCnt, int backgnd){
 			bgCnt++;
 			printf("[%d] %d\n", bgCnt, forkRet);
 
-			if(strcmp(tokens[0],"vi")==0 || !(strcmp(tokens[0],"vim"))){
-			//	kill(forkRet, SIGSTOP);
+			if(strcmp(tokens[0],"vi")==0 || !(strcmp(tokens[0],"vim"))){ // vi & does something weird 
+				// add however u want to handle this
 			}
-	/*		if (WIFEXITED(status) != 0) {
-      printf("process %d exited normally\n", forkRet);
-      printf("exit status from child is %d\n", WEXITSTATUS(status));
-   } else {
-      printf("process %d not exited normally\n", forkRet);
-   }*/
 		}   
 	}
 	if(exitCode >= 0 ){
